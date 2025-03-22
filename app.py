@@ -2,17 +2,18 @@ from flask import Flask, jsonify, render_template, request, redirect, url_for, f
 from flask_bcrypt import Bcrypt
 import mysql.connector
 from functools import wraps
+import os
 
 app = Flask(__name__)
-app.secret_key = 'supersecretkey'  # Change this to a secure secret key
+app.secret_key = os.environ.get('SECRET_KEY', 'supersecretkey')  # Change this to a secure secret key
 bcrypt = Bcrypt(app)
 
-# ✅ Connect to MySQL Database
+# ✅ Connect to MySQL Database using environment variables
 db = mysql.connector.connect(
-    host="localhost",
-    user="root",
-    password="prachi",
-    database="dashboard_db"
+    host=os.environ.get('DB_HOST', 'localhost'),
+    user=os.environ.get('DB_USER', 'root'),
+    password=os.environ.get('DB_PASSWORD', 'prachi'),
+    database=os.environ.get('DB_NAME', 'dashboard_db')
 )
 
 # Login required decorator
@@ -175,4 +176,4 @@ def get_data():
 
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 5000)))
