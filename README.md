@@ -2,7 +2,8 @@
 A dynamic and interactive dashboard built using Flask, MySQL, and Bootstrap, displaying insights from a JSON dataset. The dashboard provides filtering options to analyze data efficiently.
 
 🚀 Features
-📌 Data Visualization – Displays key insights using interactive charts and tables.
+
+Data Visualization – Displays key insights using interactive charts and tables.
 
 🔍 Filtering Options – Filter data based on end_year, topics, sector, region, source, country, and city.
 
@@ -23,24 +24,24 @@ flask_dashboard/
 │── routes.py        # Flask routes
 │── requirements.txt # Required dependencies
 │── README.md        # Project documentation
+
 🛠️ Setup & Installation
 1️⃣ Clone the repository
-
 git clone https://github.com/prachi-pandey-github/flask_dashboard.git
 cd flask_dashboard
-2️⃣ Create a virtual environment (optional but recommended)
 
+2️⃣ Create a virtual environment (optional but recommended)
 python -m venv venv
 source venv/bin/activate  # On Windows: venv\Scripts\activate
+
 3️⃣ Install dependencies
 pip install -r requirements.txt
+
 4️⃣ Set up MySQL database
 Import the JSON file into MySQL
-
 Update config.py with your MySQL credentials
 
 5️⃣ Run the Flask app
-
 python app.py
 The dashboard will be available at http://127.0.0.1:5000/.
 
