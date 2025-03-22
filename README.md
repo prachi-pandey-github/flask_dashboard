@@ -33,9 +33,6 @@ cd flask_dashboard
 python -m venv venv
 source venv/bin/activate  # On Windows: venv\Scripts\activate
 3️⃣ Install dependencies
-bash
-Copy
-Edit
 pip install -r requirements.txt
 4️⃣ Set up MySQL database
 Import the JSON file into MySQL
@@ -46,3 +43,6 @@ Update config.py with your MySQL credentials
 
 python app.py
 The dashboard will be available at http://127.0.0.1:5000/.
+
+![Dashboard Preview](wp1.PNG)
+
