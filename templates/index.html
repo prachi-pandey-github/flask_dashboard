@@ -1,0 +1,2603 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Analytics Dashboard</title>
+
+    <!-- Include Bootstrap, ApexCharts & Google Fonts -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Primary Font Awesome CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <!-- Fallback Font Awesome CDN -->
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v6.5.1/css/all.css">
+    
+    <style>
+        /* Add Font Awesome visibility check */
+        .fa, .fas, .far, .fab {
+            display: inline-block !important;
+            visibility: visible !important;
+            opacity: 1 !important;
+        }
+
+        /* Ensure icons are visible in buttons */
+        .header-right button i,
+        .notification-toggle i,
+        .user-avatar i,
+        .user-menu-btn i,
+        .dropdown-item i,
+        .metric-icon,
+        .chart-action-btn i {
+            display: inline-block !important;
+            visibility: visible !important;
+            opacity: 1 !important;
+            font-size: inherit !important;
+            line-height: inherit !important;
+        }
+
+        :root {
+            /* Light Theme Variables */
+            --primary-color: #7367F0;
+            --secondary-color: #82868B;
+            --success-color: #28C76F;
+            --info-color: #00CFE8;
+            --warning-color: #FF9F43;
+            --danger-color: #EA5455;
+            --background-color: #F8F7FA;
+            --card-shadow: 0 4px 24px 0 rgba(34, 41, 47, 0.1);
+            --text-color: #82868B;
+            --heading-color: #82868B;
+            --card-bg: white;
+            --border-color: #D8D6DE;
+            --chart-bg: white;
+        }
+
+        [data-theme="dark"] {
+            /* Dark Theme Variables */
+            --background-color: #283046;
+            --card-bg: #283046;
+            --text-color: #82868B;
+            --heading-color: #82868B;
+            --border-color: #3B4253;
+            --card-shadow: 0 4px 24px 0 rgba(0, 0, 0, 0.24);
+            --chart-bg: #283046;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            transition: all 0.3s ease;
+            padding-top: 60px;
+        }
+
+        /* Dashboard Content */
+        .dashboard-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 1.5rem;
+        }
+
+        /* Header Section */
+        .dashboard-header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: var(--card-bg);
+            padding: 0.75rem;
+            box-shadow: var(--card-shadow);
+            z-index: 1000;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: 60px;
+        }
+
+        /* Add styles for header icons */
+        .header-right button i {
+            font-size: 1.1rem;
+            margin-right: 0.5rem;
+            color: var(--text-color);
+            transition: color 0.15s ease;
+            display: inline-block !important;
+            visibility: visible !important;
+            opacity: 1 !important;
+        }
+
+        .header-right button:hover i {
+            color: var(--primary-color);
+        }
+
+        .notification-toggle i {
+            font-size: 1.2rem;
+            display: inline-block !important;
+            visibility: visible !important;
+            opacity: 1 !important;
+        }
+
+        .user-avatar i {
+            font-size: 1rem;
+            color: white;
+            display: inline-block !important;
+            visibility: visible !important;
+            opacity: 1 !important;
+        }
+
+        .user-menu-btn .fa-chevron-down {
+            font-size: 0.8rem;
+            margin-left: 0.5rem;
+            display: inline-block !important;
+            visibility: visible !important;
+            opacity: 1 !important;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .dashboard-title {
+            color: var(--heading-color);
+            font-weight: 600;
+            font-size: 1.5rem;
+            margin: 0;
+        }
+
+        /* Theme Toggle Button */
+        .theme-toggle {
+            padding: 0.5rem 1rem;
+            border-radius: 0.358rem;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.15s ease;
+        }
+
+        .theme-toggle:hover {
+            transform: translateY(-1px);
+            box-shadow: var(--card-shadow);
+        }
+
+        /* User Menu Styles */
+        .user-avatar {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: var(--primary-color);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.875rem;
+        }
+
+        .user-name {
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: var(--heading-color);
+        }
+
+        .dropdown-menu {
+            background: var(--card-bg);
+            border-color: var(--border-color);
+            box-shadow: var(--card-shadow);
+            margin-top: 0.5rem;
+            min-width: 200px;
+            border-radius: 0.358rem;
+            padding: 0.5rem;
+            right: 0;
+            left: auto;
+        }
+
+        .dropdown-item {
+            color: var(--text-color);
+            padding: 0.75rem 1rem;
+            transition: all 0.15s ease;
+            border-radius: 0.358rem;
+        }
+
+        .dropdown-item:hover {
+            background: rgba(115, 103, 240, 0.12);
+            color: var(--primary-color);
+        }
+
+        .dropdown-item.text-danger:hover {
+            background: rgba(234, 84, 85, 0.12);
+            color: var(--danger-color);
+        }
+
+        .dropdown-divider {
+            border-color: var(--border-color);
+            opacity: 0.5;
+            margin: 0.5rem 0;
+        }
+
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--background-color);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--border-color);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--secondary-color);
+        }
+
+        /* Grid Layout Improvements */
+        .metrics-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .charts-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+            gap: 1.25rem;
+            margin-bottom: 1rem;
+        }
+
+        /* Add specific styling for first row of charts */
+        .charts-row:first-of-type {
+            margin-top: 0.25rem;
+        }
+
+        @media (max-width: 768px) {
+            .charts-row {
+                grid-template-columns: 1fr;
+            }
+            .metrics-row {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .chart-content {
+                height: 250px;
+            }
+        }
+
+        /* Filter Grid */
+        .filters-section {
+            background: var(--card-bg);
+            border-radius: 0.5rem;
+            padding: 0.5rem;
+            box-shadow: var(--card-shadow);
+            margin-bottom: 0.75rem;
+        }
+
+        .filters-section .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.35rem;
+        }
+
+        .filters-section .chart-title {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--heading-color);
+            margin: 0;
+        }
+
+        .chart-action-btn {
+            padding: 0.5rem 1rem;
+            border-radius: 0.358rem;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.15s ease;
+            font-size: 0.875rem;
+        }
+
+        .chart-action-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: var(--card-shadow);
+            background: rgba(115, 103, 240, 0.12);
+            color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+
+        .chart-action-btn i {
+            font-size: 0.875rem;
+        }
+
+        .filters-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 0.5rem;
+        }
+
+        .filter-group {
+            margin-bottom: 0;
+        }
+
+        .filter-label {
+            font-size: 0.7rem;
+            font-weight: 500;
+            margin-bottom: 0.2rem;
+            color: var(--text-color);
+            display: block;
+        }
+
+        .form-select {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            border-radius: 0.358rem;
+            padding: 0.25rem;
+            font-size: 0.8rem;
+            transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+        }
+
+        .form-select:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 0.2rem rgba(115, 103, 240, 0.25);
+            outline: 0;
+        }
+
+        .form-select option {
+            background-color: var(--card-bg);
+            color: var(--text-color);
+        }
+
+        @media (max-width: 768px) {
+            .filters-grid {
+                grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+                gap: 0.35rem;
+            }
+            
+            .filters-section {
+                padding: 0.5rem;
+            }
+            
+            .chart-action-btn {
+                padding: 0.2rem 0.4rem;
+            }
+        }
+
+        /* Chart Container Enhancements */
+        .chart-container {
+            background: var(--card-bg);
+            border-radius: 0.5rem;
+            padding: 1.25rem;
+            box-shadow: var(--card-shadow);
+            margin-bottom: 1rem;
+            overflow: hidden;
+        }
+
+        /* Add specific styling for Regional Distribution container */
+        .chart-container:last-child {
+            margin-top: 0;
+            margin-bottom: 2rem;
+        }
+
+        /* Add specific styling for first row of charts */
+        .charts-row:first-of-type {
+            margin-top: 0;
+        }
+
+        .chart-header {
+            display: flex;
+            justify-content: flex-start;
+            align-items: center;
+            margin-bottom: 0.75rem;
+        }
+
+        .chart-title {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--heading-color);
+            margin: 0;
+        }
+
+        .chart-content {
+            height: 300px;
+            position: relative;
+            margin-top: 0.5rem;
+        }
+
+        /* Metrics Cards */
+        .metrics-card {
+            background: var(--card-bg);
+            border-radius: 0.5rem;
+            padding: 0.75rem;
+            box-shadow: var(--card-shadow);
+            transition: transform 0.2s;
+        }
+
+        .metrics-card:hover {
+            transform: translateY(-2px);
+        }
+
+        .metric-icon {
+            font-size: 1.25rem;
+            color: var(--primary-color);
+            margin-bottom: 0.35rem;
+        }
+
+        .metric-value {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--heading-color);
+            margin-bottom: 0.15rem;
+        }
+
+        .metric-label {
+            font-size: 0.8rem;
+            color: var(--text-color);
+        }
+
+        /* User Menu Styles */
+        .user-menu-btn {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.375rem 0.75rem;
+            background: transparent;
+            border: 1px solid var(--border-color);
+            border-radius: 0.358rem;
+            color: var(--text-color);
+            cursor: pointer;
+        }
+
+        .dropdown-menu {
+            background: var(--card-bg);
+            border-color: var(--border-color);
+            box-shadow: var(--card-shadow);
+            margin-top: 0.5rem;
+            min-width: 200px;
+            border-radius: 0.358rem;
+            padding: 0.5rem;
+            right: 0;
+            left: auto;
+        }
+
+        .dropdown-item {
+            color: var(--text-color);
+            padding: 0.75rem 1rem;
+            transition: all 0.15s ease;
+            border-radius: 0.358rem;
+        }
+
+        .dropdown-item:hover {
+            background: rgba(115, 103, 240, 0.12);
+            color: var(--primary-color);
+        }
+
+        .dropdown-item.text-danger:hover {
+            background: rgba(234, 84, 85, 0.12);
+            color: var(--danger-color);
+        }
+
+        .dropdown-divider {
+            border-color: var(--border-color);
+            opacity: 0.5;
+            margin: 0.5rem 0;
+        }
+
+        /* Loading State */
+        .loading-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(var(--card-bg-rgb), 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 10;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid var(--border-color);
+            border-top-color: var(--primary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* Language Toggle Button */
+        .language-toggle {
+            padding: 0.5rem 1rem;
+            border-radius: 0.358rem;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.15s ease;
+        }
+
+        .language-toggle:hover {
+            transform: translateY(-1px);
+            box-shadow: var(--card-shadow);
+            background: rgba(115, 103, 240, 0.12);
+            color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+
+        .language-toggle i {
+            font-size: 1.1rem;
+            margin-right: 0.5rem;
+            display: inline-block !important;
+            visibility: visible !important;
+            opacity: 1 !important;
+        }
+
+        /* Add notification styles after Language Toggle Button styles */
+        .notification-toggle {
+            padding: 0.5rem;
+            border-radius: 0.358rem;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            position: relative;
+            transition: all 0.15s ease;
+            width: 40px;
+            height: 40px;
+            justify-content: center;
+        }
+
+        .notification-toggle:hover {
+            transform: translateY(-1px);
+            box-shadow: var(--card-shadow);
+            background: rgba(115, 103, 240, 0.12);
+            color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+
+        .notification-toggle i {
+            font-size: 1.25rem;
+        }
+
+        .notification-badge {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: var(--danger-color);
+            color: white;
+            border-radius: 50%;
+            width: 22px;
+            height: 22px;
+            font-size: 0.75rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid var(--card-bg);
+            font-weight: 600;
+        }
+
+        .notification-badge .count {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: var(--danger-color);
+            color: white;
+            border-radius: 50%;
+            width: 16px;
+            height: 16px;
+            font-size: 0.7rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid var(--card-bg);
+        }
+
+        .notification-badge i {
+            font-size: 0.8rem;
+        }
+
+        @keyframes bellRing {
+            0% { transform: rotate(0); }
+            15% { transform: rotate(5deg); }
+            30% { transform: rotate(-5deg); }
+            45% { transform: rotate(4deg); }
+            60% { transform: rotate(-4deg); }
+            75% { transform: rotate(2deg); }
+            85% { transform: rotate(-2deg); }
+            92% { transform: rotate(1deg); }
+            100% { transform: rotate(0); }
+        }
+
+        .notification-toggle:hover i {
+            animation: bellRing 0.8s ease;
+        }
+
+        .notification-dropdown {
+            width: 350px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .notification-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.5rem 1rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .notification-title {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--heading-color);
+            margin: 0;
+        }
+
+        .mark-all-read {
+            font-size: 0.8rem;
+            color: var(--primary-color);
+            cursor: pointer;
+            text-decoration: none;
+        }
+
+        .notification-item {
+            display: flex;
+            padding: 0.75rem 1rem;
+            border-bottom: 1px solid var(--border-color);
+            transition: all 0.15s ease;
+            text-decoration: none;
+            color: var(--text-color);
+        }
+
+        .notification-item:last-child {
+            border-bottom: none;
+        }
+
+        .notification-item:hover {
+            background: rgba(115, 103, 240, 0.08);
+        }
+
+        .notification-item.unread {
+            background: rgba(115, 103, 240, 0.05);
+        }
+
+        .notification-icon {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            background: rgba(115, 103, 240, 0.12);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 1rem;
+            flex-shrink: 0;
+        }
+
+        .notification-icon i {
+            color: var(--primary-color);
+            font-size: 1.2rem;
+        }
+
+        .notification-content {
+            flex: 1;
+        }
+
+        .notification-text {
+            margin: 0 0 0.25rem;
+            font-size: 0.875rem;
+            color: var(--heading-color);
+        }
+
+        .notification-time {
+            font-size: 0.75rem;
+            color: var(--secondary-color);
+        }
+
+        /* Add styles for filter toggle button after notification styles */
+        .filter-toggle-btn {
+            padding: 0.5rem 1rem;
+            border-radius: 0.358rem;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.15s ease;
+            font-size: 0.875rem;
+        }
+
+        .filter-toggle-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: var(--card-shadow);
+            background: rgba(115, 103, 240, 0.12);
+            color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+
+        .filter-toggle-btn i {
+            font-size: 1.1rem;
+            margin-right: 0.5rem;
+            display: inline-block !important;
+            visibility: visible !important;
+            opacity: 1 !important;
+        }
+
+        .filter-toggle-btn.active {
+            background: rgba(115, 103, 240, 0.12);
+            color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+    </style>
+</head>
+<body>
+    <!-- Add this script right after the body tag -->
+    <script>
+        // Check if Font Awesome is loaded
+        document.addEventListener('DOMContentLoaded', function() {
+            const style = getComputedStyle(document.querySelector('.fa-bell'));
+            if (style.display === 'none') {
+                console.error('Font Awesome is not loading correctly');
+                // Try to load Font Awesome dynamically
+                const link = document.createElement('link');
+                link.rel = 'stylesheet';
+                link.href = 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css';
+                document.head.appendChild(link);
+            } else {
+                console.log('Font Awesome is loaded successfully');
+            }
+        });
+    </script>
+    <!-- Dashboard Header -->
+    <header class="dashboard-header">
+        <div class="header-left">
+            <h2 class="dashboard-title">Analytics Dashboard</h2>
+        </div>
+        <div class="header-right">
+            <div class="dropdown">
+                <button class="notification-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    <i class="fas fa-bell"></i>
+                    <span class="notification-badge">
+                        <i class="fas fa-bell fa-xs"></i>
+                        <span class="count">3</span>
+                    </span>
+                </button>
+                <div class="dropdown-menu notification-dropdown">
+                    <div class="notification-header">
+                        <h6 class="notification-title">Notifications</h6>
+                        <a href="#" class="mark-all-read"><i class="fas fa-check-double me-1"></i>Mark all as read</a>
+                    </div>
+                    <div class="notification-list">
+                        <a href="#" class="notification-item unread">
+                            <div class="notification-icon" style="background: rgba(234, 84, 85, 0.12)">
+                                <i class="fas fa-exclamation-circle" style="color: #EA5455"></i>
+                            </div>
+                            <div class="notification-content">
+                                <p class="notification-text">Unusual spike in intensity detected for Energy sector</p>
+                                <span class="notification-time">2 hours ago</span>
+                            </div>
+                        </a>
+                        <a href="#" class="notification-item unread">
+                            <div class="notification-icon" style="background: rgba(40, 199, 111, 0.12)">
+                                <i class="fas fa-chart-bar" style="color: #28C76F"></i>
+                            </div>
+                            <div class="notification-content">
+                                <p class="notification-text">New region data available for Northern America</p>
+                                <span class="notification-time">5 hours ago</span>
+                            </div>
+                        </a>
+                        <a href="#" class="notification-item unread">
+                            <div class="notification-icon" style="background: rgba(255, 159, 67, 0.12)">
+                                <i class="fas fa-shield-alt" style="color: #FF9F43"></i>
+                            </div>
+                            <div class="notification-content">
+                                <p class="notification-text">Critical update: New risk factors identified in Technology sector</p>
+                                <span class="notification-time">1 day ago</span>
+                            </div>
+                        </a>
+                        <a href="#" class="notification-item">
+                            <div class="notification-icon" style="background: rgba(0, 207, 232, 0.12)">
+                                <i class="fas fa-sync-alt" style="color: #00CFE8"></i>
+                            </div>
+                            <div class="notification-content">
+                                <p class="notification-text">Dashboard data has been updated</p>
+                                <span class="notification-time">2 days ago</span>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <button class="filter-toggle-btn" onclick="toggleFilters()">
+                <i class="fas fa-filter"></i>
+                <span>Filters</span>
+            </button>
+            <button class="language-toggle" onclick="toggleLanguage()">
+                <i class="fas fa-language"></i>
+                <span id="language-text">हिंदी | English</span>
+            </button>
+            <button class="theme-toggle" onclick="toggleTheme()">
+                <i class="fas fa-moon"></i>
+                <span>Dark Mode</span>
+            </button>
+            <div class="user-menu">
+                <button class="user-menu-btn" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    <div class="user-avatar">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <span class="user-name">{{ session.username }}</span>
+                    <i class="fas fa-chevron-down"></i>
+                </button>
+                <ul class="dropdown-menu">
+                    <li><a class="dropdown-item" href="{{ url_for('profile') }}">
+                        <i class="fas fa-user me-2"></i> Profile
+                    </a></li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li><a class="dropdown-item text-danger" href="{{ url_for('logout') }}">
+                        <i class="fas fa-sign-out-alt me-2"></i> Logout
+                    </a></li>
+                </ul>
+            </div>
+        </div>
+    </header>
+
+    <!-- Dashboard Content -->
+    <div class="dashboard-content">
+        <!-- Filters Section -->
+        <div class="filters-section" id="filtersSection" style="display: none;">
+            <div class="chart-header">
+                <h5 class="chart-title">Filters</h5>
+                <div class="chart-actions">
+                    <button class="chart-action-btn" onclick="resetFilters()">
+                        <i class="fas fa-redo-alt me-1"></i> Reset
+                    </button>
+                </div>
+            </div>
+            <div class="filters-grid">
+                <div class="filter-group">
+                    <label class="filter-label">End Year</label>
+                    <select class="form-select" id="year-filter">
+                        <option value="">All Years</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label class="filter-label">Sector</label>
+                    <select class="form-select" id="sector-filter">
+                        <option value="">All Sectors</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label class="filter-label">Country</label>
+                    <select class="form-select" id="country-filter">
+                        <option value="">All Countries</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label class="filter-label">PEST</label>
+                    <select class="form-select" id="pest-filter">
+                        <option value="">All</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label class="filter-label">Region</label>
+                    <select class="form-select" id="region-filter">
+                        <option value="">All Regions</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label class="filter-label">Topic</label>
+                    <select class="form-select" id="topic-filter">
+                        <option value="">All Topics</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label class="filter-label">SWOT</label>
+                    <select class="form-select" id="swot-filter">
+                        <option value="">All</option>
+                        <option value="Strength">Strengths</option>
+                        <option value="Weakness">Weaknesses</option>
+                        <option value="Opportunity">Opportunities</option>
+                        <option value="Threat">Threats</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label class="filter-label">Source</label>
+                    <select class="form-select" id="source-filter">
+                        <option value="">All Sources</option>
+                    </select>
+                </div>
+                </div>
+            </div>
+
+        <!-- Key Metrics -->
+        <div class="metrics-row">
+            <div class="metrics-card text-center">
+                <i class="fas fa-chart-line metric-icon"></i>
+                <div class="metric-value" id="avg-intensity">-</div>
+                <div class="metric-label">Average Intensity</div>
+            </div>
+            <div class="metrics-card text-center">
+                <i class="fas fa-percentage metric-icon"></i>
+                <div class="metric-value" id="avg-likelihood">-</div>
+                <div class="metric-label">Average Likelihood</div>
+            </div>
+            <div class="metrics-card text-center">
+                <i class="fas fa-star metric-icon"></i>
+                <div class="metric-value" id="avg-relevance">-</div>
+                <div class="metric-label">Average Relevance</div>
+            </div>
+            <div class="metrics-card text-center">
+                <i class="fas fa-globe metric-icon"></i>
+                <div class="metric-value" id="total-countries">-</div>
+                <div class="metric-label">Total Countries</div>
+                </div>
+            </div>
+
+        <!-- Charts Section -->
+        <div class="charts-row">
+            <div class="chart-container">
+                <div class="chart-header">
+                    <h5 class="chart-title">Intensity Over Time</h5>
+                </div>
+                <div class="chart-content">
+                    <div id="intensity-trend"></div>
+                </div>
+            </div>
+            <div class="chart-container">
+                <div class="chart-header">
+                    <h5 class="chart-title">Sector Distribution</h5>
+                </div>
+                <div class="chart-content">
+                    <div id="sector-distribution"></div>
+                </div>
+                </div>
+            </div>
+
+        <div class="charts-row">
+            <div class="chart-container">
+                <div class="chart-header">
+                    <h5 class="chart-title">Likelihood Distribution</h5>
+                </div>
+                <div class="chart-content">
+                    <div id="likelihood-chart"></div>
+                </div>
+            </div>
+            <div class="chart-container">
+                <div class="chart-header">
+                    <h5 class="chart-title">Top Countries by Intensity</h5>
+                </div>
+                <div class="chart-content">
+                    <div id="country-intensity"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="charts-row">
+            <div class="chart-container">
+                <div class="chart-header">
+                    <h5 class="chart-title">SWOT Analysis Distribution</h5>
+                </div>
+                <div class="chart-content">
+                    <div id="swot-distribution"></div>
+                </div>
+            </div>
+            <div class="chart-container">
+                <div class="chart-header">
+                    <h5 class="chart-title">Topic Distribution</h5>
+                </div>
+                <div class="chart-content">
+                    <div id="topic-distribution"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="charts-row">
+            <div class="chart-container">
+                <div class="chart-header">
+                    <h5 class="chart-title">Relevance Distribution</h5>
+                </div>
+                <div class="chart-content">
+                    <div id="relevance-distribution"></div>
+                </div>
+            </div>
+            <div class="chart-container">
+                <div class="chart-header">
+                    <h5 class="chart-title">PEST Distribution</h5>
+                </div>
+                <div class="chart-content">
+                    <div id="pest-distribution"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Regional Distribution Chart moved to bottom -->
+        <div class="chart-container">
+            <div class="chart-header">
+                <h5 class="chart-title">Regional Distribution</h5>
+            </div>
+            <div class="chart-content">
+                <div id="region-distribution"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let globalData = [];
+        let charts = {};
+
+        function initializeFilters(data) {
+            const filters = {
+                year: new Set(),
+                sector: new Set(),
+                country: new Set(),
+                pest: new Set(),
+                region: new Set(),
+                topic: new Set(),
+                source: new Set()
+            };
+
+            // Debug log for initial data
+            console.log("Total records received:", data.length);
+
+            data.forEach(row => {
+                if (row.end_year && row.end_year !== "") filters.year.add(row.end_year);
+                if (row.sector && row.sector !== "") filters.sector.add(row.sector);
+                if (row.country && row.country !== "") filters.country.add(row.country);
+                if (row.pestle && row.pestle !== "") filters.pest.add(row.pestle);
+                if (row.region && row.region !== "") filters.region.add(row.region);
+                if (row.topic && row.topic !== "") filters.topic.add(row.topic);
+                if (row.source && row.source !== "" && row.source.toLowerCase() !== "null") {
+                    filters.source.add(row.source.trim());
+                }
+            });
+
+            // Debug log for filter sets
+            Object.keys(filters).forEach(key => {
+                console.log(`${key} unique values:`, Array.from(filters[key]));
+            });
+
+            // Populate filter dropdowns
+            Object.keys(filters).forEach(key => {
+                const values = Array.from(filters[key]).sort();
+                populateFilter(`${key}-filter`, values);
+            });
+
+            // Add event listeners
+            document.querySelectorAll('.form-select').forEach(select => {
+                select.addEventListener('change', updateDashboard);
+            });
+        }
+
+        function populateFilter(id, values) {
+            const select = document.getElementById(id);
+            if (!select) {
+                console.error(`Filter element not found: ${id}`);
+                return;
+            }
+
+            // Clear existing options except the first one (All option)
+            while (select.options.length > 1) {
+                select.remove(1);
+            }
+
+            // Add new options
+            values.forEach(value => {
+                if (value && value !== "" && value.toLowerCase() !== "null") {
+                    const option = document.createElement('option');
+                    option.value = value;
+                    option.textContent = value;
+                    select.appendChild(option);
+                }
+            });
+
+            // Log the number of options added
+            console.log(`${id} populated with ${select.options.length - 1} options`);
+        }
+
+        function determineSWOT(row) {
+            // Default to undefined if no clear category
+            let swot = undefined;
+            
+            // Convert relevant fields to lowercase for case-insensitive matching
+            const insight = (row.insight || "").toLowerCase();
+            const title = (row.title || "").toLowerCase();
+            const sector = (row.sector || "").toLowerCase();
+            const intensity = row.intensity || 0;
+            const likelihood = row.likelihood || 0;
+            const relevance = row.relevance || 0;
+            
+            // Keywords for each category
+            const strengthKeywords = ["growth", "success", "positive", "strong", "increase", "improve", "advantage", "leading", "innovation"];
+            const weaknessKeywords = ["weak", "decline", "poor", "loss", "decrease", "deficit", "shortage", "limited"];
+            const opportunityKeywords = ["opportunity", "potential", "emerging", "innovation", "new market", "expansion", "development"];
+            const threatKeywords = ["threat", "risk", "challenge", "danger", "competition", "crisis", "conflict", "uncertainty"];
+            
+            // Check for keywords in insight and title
+            const text = insight + " " + title;
+            
+            // Strength indicators
+            if ((intensity >= 70 && likelihood >= 3.5 && relevance >= 3) || 
+                strengthKeywords.some(keyword => text.includes(keyword))) {
+                swot = "Strength";
+            }
+            
+            // Weakness indicators
+            else if ((intensity <= 30 && likelihood >= 3) || 
+                    weaknessKeywords.some(keyword => text.includes(keyword))) {
+                swot = "Weakness";
+            }
+            
+            // Opportunity indicators
+            else if ((intensity >= 50 && likelihood >= 3 && relevance >= 3) || 
+                    opportunityKeywords.some(keyword => text.includes(keyword))) {
+                swot = "Opportunity";
+            }
+            
+            // Threat indicators
+            else if ((intensity >= 60 && likelihood <= 2.5) || 
+                    threatKeywords.some(keyword => text.includes(keyword))) {
+                swot = "Threat";
+            }
+            
+            // If no category was assigned but intensity and likelihood are available
+            if (!swot && intensity && likelihood) {
+                if (intensity >= 60 && likelihood >= 3) {
+                    swot = "Strength";
+                } else if (intensity < 40) {
+                    swot = "Weakness";
+                } else if (likelihood >= 3) {
+                    swot = "Opportunity";
+                } else {
+                    swot = "Threat";
+                }
+            }
+            
+            return swot;
+        }
+
+        function getFilteredData() {
+            return globalData.filter(row => {
+                const yearFilter = document.getElementById('year-filter').value;
+                const sectorFilter = document.getElementById('sector-filter').value;
+                const countryFilter = document.getElementById('country-filter').value;
+                const pestFilter = document.getElementById('pest-filter').value;
+                const regionFilter = document.getElementById('region-filter').value;
+                const topicFilter = document.getElementById('topic-filter').value;
+                const swotFilter = document.getElementById('swot-filter').value;
+                const sourceFilter = document.getElementById('source-filter').value;
+
+                // Add SWOT analysis to each row
+                const swotCategory = determineSWOT(row);
+
+                return (!yearFilter || row.end_year === yearFilter) &&
+                       (!sectorFilter || row.sector === sectorFilter) &&
+                       (!countryFilter || row.country === countryFilter) &&
+                       (!pestFilter || row.pestle === pestFilter) &&
+                       (!regionFilter || row.region === regionFilter) &&
+                       (!topicFilter || row.topic === topicFilter) &&
+                       (!swotFilter || swotCategory === swotFilter) &&
+                       (!sourceFilter || row.source === sourceFilter);
+            });
+        }
+
+        function resetFilters() {
+            document.querySelectorAll('.form-select').forEach(select => {
+                select.value = '';
+            });
+            updateDashboard();
+        }
+
+        function updateDashboard() {
+            const filteredData = getFilteredData();
+            updateCharts(filteredData);
+            updateMetrics(filteredData);
+        }
+
+        function initializeCharts(data) {
+            const chartHeight = 300;
+            const isDarkMode = document.documentElement.getAttribute('data-theme') === 'dark';
+            
+            const chartOptions = {
+                chart: {
+                    height: chartHeight,
+                    toolbar: {
+                        show: false
+                    },
+                    zoom: {
+                        enabled: false
+                    },
+                    fontFamily: 'Inter, sans-serif',
+                    background: 'transparent',
+                    parentHeightOffset: 0,
+                    offsetY: 0,
+                    offsetX: 0
+                },
+                theme: {
+                    mode: isDarkMode ? 'dark' : 'light'
+                },
+                colors: ['#7367F0', '#00CFE8', '#28C76F', '#EA5455', '#FF9F43'],
+                grid: {
+                    borderColor: isDarkMode ? '#3B4253' : '#f1f1f1',
+                    padding: {
+                        top: 5,
+                        right: 20,
+                        bottom: 5,
+                        left: 20
+                    }
+                },
+                dataLabels: {
+                    style: {
+                        fontSize: '10px',
+                        fontFamily: 'Inter, sans-serif',
+                        fontWeight: 500,
+                        colors: [isDarkMode ? '#82868B' : '#82868B']
+                    },
+                    offsetY: 0
+                },
+                stroke: {
+                    curve: 'smooth',
+                    width: 2.5
+                },
+                legend: {
+                    fontSize: '11px',
+                    fontFamily: 'Inter, sans-serif',
+                    fontWeight: 500,
+                    labels: {
+                        colors: isDarkMode ? '#82868B' : '#82868B'
+                    },
+                    itemMargin: {
+                        horizontal: 8,
+                        vertical: 5
+                    },
+                    position: 'bottom',
+                    offsetY: 0
+                },
+                xaxis: {
+                    labels: {
+                        style: {
+                            fontSize: '10px',
+                            fontFamily: 'Inter, sans-serif',
+                            colors: isDarkMode ? '#82868B' : '#82868B'
+                        },
+                        trim: true,
+                        maxHeight: 120,
+                        hideOverlappingLabels: true
+                    },
+                    axisBorder: {
+                        show: false
+                    },
+                    axisTicks: {
+                        show: false
+                    },
+                    tickPlacement: 'on'
+                },
+                yaxis: {
+                    labels: {
+                        style: {
+                            fontSize: '10px',
+                            fontFamily: 'Inter, sans-serif',
+                            colors: isDarkMode ? '#82868B' : '#82868B'
+                        },
+                        trim: true,
+                        maxWidth: 150
+                    },
+                    tickAmount: 5
+                },
+                tooltip: {
+                    theme: isDarkMode ? 'dark' : 'light',
+                    style: {
+                        fontSize: '11px',
+                        fontFamily: 'Inter, sans-serif'
+                    }
+                }
+            };
+
+            // Initialize all charts with modern styling
+            charts.intensityTrend = new ApexCharts(document.querySelector("#intensity-trend"), {
+                ...chartOptions,
+                chart: { 
+                    ...chartOptions.chart,
+                    type: 'line',
+                    height: chartHeight,
+                    dropShadow: {
+                        enabled: true,
+                        color: '#7367F0',
+                        top: 18,
+                        left: 7,
+                        blur: 10,
+                        opacity: 0.2
+                    }
+                },
+                series: [{
+                    name: 'Intensity',
+                    data: []
+                }],
+                xaxis: {
+                    ...chartOptions.xaxis,
+                    categories: [],
+                    tickAmount: 6,
+                    labels: {
+                        rotate: -45,
+                        rotateAlways: true,
+                        style: {
+                            fontSize: '12px',
+                            fontFamily: 'Inter, sans-serif'
+                        },
+                        formatter: function(value) {
+                            return value ? value.toString() : '';
+                        }
+                    },
+                    title: {
+                        text: 'Year',
+                        style: {
+                            fontSize: '13px',
+                            fontWeight: 600
+                        }
+                    }
+                },
+                yaxis: {
+                    ...chartOptions.yaxis,
+                    title: { 
+                        text: 'Intensity',
+                        style: {
+                            fontSize: '13px',
+                            fontWeight: 600
+                        }
+                    }
+                }
+            });
+
+            charts.sectorDistribution = new ApexCharts(document.querySelector("#sector-distribution"), {
+                ...chartOptions,
+                chart: { 
+                    ...chartOptions.chart,
+                    type: 'donut',
+                    height: chartHeight
+                },
+                series: [],
+                labels: [],
+                legend: { 
+                    position: 'bottom',
+                    fontSize: '11px',
+                    fontFamily: 'Inter, sans-serif',
+                    fontWeight: 500,
+                    markers: {
+                        width: 10,
+                        height: 10,
+                        radius: 10
+                    },
+                    itemMargin: {
+                        horizontal: 8,
+                        vertical: 3
+                    }
+                },
+                plotOptions: {
+                    pie: {
+                        donut: {
+                            size: '65%',
+                            labels: {
+                                show: true,
+                                name: {
+                                    fontSize: '11px',
+                                    fontFamily: 'Inter, sans-serif',
+                                    fontWeight: 500,
+                                    offsetY: -10
+                                },
+                                value: {
+                                    fontSize: '11px',
+                                    fontFamily: 'Inter, sans-serif',
+                                    fontWeight: 500,
+                                    offsetY: 10
+                                },
+                                total: {
+                                    show: true,
+                                    fontSize: '11px',
+                                    fontFamily: 'Inter, sans-serif',
+                                    fontWeight: 500
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+
+            charts.likelihoodChart = new ApexCharts(document.querySelector("#likelihood-chart"), {
+                ...chartOptions,
+                chart: { 
+                    ...chartOptions.chart,
+                    type: 'bar',
+                    height: chartHeight
+                },
+                series: [{
+                    name: 'Count',
+                    data: []
+                }],
+                plotOptions: {
+                    bar: {
+                        horizontal: false,
+                        columnWidth: '60%',
+                        borderRadius: 4
+                    }
+                },
+                dataLabels: {
+                    enabled: true
+                },
+                xaxis: {
+                    ...chartOptions.xaxis,
+                    categories: [],
+                    title: { text: 'Likelihood Level' }
+                },
+                yaxis: {
+                    ...chartOptions.yaxis,
+                    title: { text: 'Count' }
+                }
+            });
+
+            charts.countryIntensity = new ApexCharts(document.querySelector("#country-intensity"), {
+                ...chartOptions,
+                chart: { 
+                    ...chartOptions.chart,
+                    type: 'bar',
+                    height: chartHeight
+                },
+                series: [{
+                    name: 'Intensity',
+                    data: []
+                }],
+                plotOptions: {
+                    bar: {
+                        horizontal: true,
+                        borderRadius: 4
+                    }
+                },
+                dataLabels: {
+                    enabled: true,
+                    formatter: function(val) {
+                        return val.toFixed(1);
+                    }
+                },
+                xaxis: {
+                    ...chartOptions.xaxis,
+                    categories: [],
+                    
+                    title: { text: 'Country' }
+                },
+                yaxis: {
+                    ...chartOptions.yaxis,
+                    reversed: true,
+                    title: { text: 'Intensity' }
+                }
+            });
+
+            // Initialize Region Distribution Chart
+            charts.regionDistribution = new ApexCharts(document.querySelector("#region-distribution"), {
+                ...chartOptions,
+                chart: { 
+                    ...chartOptions.chart,
+                    type: 'bar',
+                    height: 650,
+                    animations: {
+                        enabled: true,
+                        dynamicAnimation: {
+                            speed: 350
+                        }
+                    },
+                    toolbar: {
+                        show: false
+                    }
+                },
+                series: [{
+                    name: 'Number of Insights',
+                    data: []
+                }],
+                plotOptions: {
+                    bar: {
+                        horizontal: true,
+                        distributed: true,
+                        dataLabels: {
+                            position: 'center'
+                        },
+                        borderRadius: 4,
+                        barHeight: '75%'
+                    }
+                },
+                dataLabels: {
+                    enabled: true,
+                    textAnchor: 'middle',
+                    style: {
+                        colors: [isDarkMode ? '#FFFFFF' : '#2C2C2C'],
+                        fontSize: '13px',
+                        fontWeight: '600',
+                        fontFamily: 'Inter, sans-serif'
+                    },
+                    formatter: function(val, opt) {
+                        const percentage = processedRegions[opt.dataPointIndex][2];
+                        return `${val} (${percentage.toFixed(1)}%)`;
+                    },
+                    dropShadow: {
+                        enabled: true,
+                        top: 1,
+                        left: 1,
+                        blur: 2,
+                        opacity: 0.2
+                    }
+                },
+                xaxis: {
+                    ...chartOptions.xaxis,
+                    title: { 
+                        text: 'Number of Insights',
+                        style: {
+                            fontSize: '14px',
+                            fontWeight: 600,
+                            color: isDarkMode ? '#D0D2D6' : '#2C2C2C'
+                        }
+                    }
+                },
+                yaxis: {
+                    ...chartOptions.yaxis,
+                    title: { 
+                        text: 'Region',
+                        style: {
+                            fontSize: '14px',
+                            fontWeight: 600,
+                            color: isDarkMode ? '#D0D2D6' : '#2C2C2C'
+                        }
+                    }
+                },
+                colors: ['#7367F0', '#28C76F', '#00CFE8', '#FF9F43', '#EA5455', '#A798FF', '#26A69A'],
+                title: {
+                    text: 'Distribution of Insights by Region',
+                    align: 'center',
+                    style: {
+                        fontSize: '16px',
+                        fontWeight: 'bold',
+                        fontFamily: 'Inter, sans-serif',
+                        color: isDarkMode ? '#D0D2D6' : '#2C2C2C'
+                    }
+                },
+                tooltip: {
+                    y: {
+                        title: {
+                            formatter: function() {
+                                return 'Region: '
+                            }
+                        }
+                    }
+                }
+            });
+
+            charts.topicDistribution = new ApexCharts(document.querySelector("#topic-distribution"), {
+                ...chartOptions,
+                chart: {
+                    ...chartOptions.chart,
+                    type: 'bar',
+                    height: chartHeight,
+                    stacked: true
+                },
+                series: [{
+                    name: 'Topics',
+                    data: []
+                }],
+                plotOptions: {
+                    bar: {
+                        horizontal: true,
+                        distributed: true,
+                        dataLabels: {
+                            position: 'center'
+                        },
+                        barHeight: '60%'
+                    }
+                },
+                dataLabels: {
+                    enabled: true,
+                    style: {
+                        fontSize: '10px',
+                        colors: ['#fff']
+                    },
+                    formatter: function(val) {
+                        return val.toFixed(0);
+                    }
+                },
+                xaxis: {
+                    ...chartOptions.xaxis,
+                    categories: [],
+                    title: { text: 'Count' }
+                },
+                yaxis: {
+                    ...chartOptions.yaxis,
+                    title: { text: 'Topics' },
+                    labels: {
+                        maxWidth: 150,
+                        maxHeight: 200,
+                        style: {
+                            fontSize: '10px'
+                        }
+                    }
+                },
+                colors: ['#008FFB', '#00E396', '#FEB019', '#FF4560', '#775DD0', '#546E7A', '#26a69a'],
+                legend: {
+                    show: false
+                }
+            });
+
+            charts.relevanceDistribution = new ApexCharts(document.querySelector("#relevance-distribution"), {
+                ...chartOptions,
+                chart: { 
+                    ...chartOptions.chart,
+                    type: 'bar',
+                    height: chartHeight
+                },
+                series: [{
+                    name: 'Count',
+                    data: []
+                }],
+                plotOptions: {
+                    bar: {
+                        horizontal: false,
+                        columnWidth: '60%',
+                        borderRadius: 4
+                    }
+                },
+                dataLabels: {
+                    enabled: true
+                },
+                xaxis: {
+                    ...chartOptions.xaxis,
+                    title: { text: 'Relevance Level' }
+                },
+                yaxis: {
+                    ...chartOptions.yaxis,
+                    title: { text: 'Count' }
+                }
+            });
+
+            charts.pestDistribution = new ApexCharts(document.querySelector("#pest-distribution"), {
+                ...chartOptions,
+                chart: { 
+                    ...chartOptions.chart,
+                    type: 'bar',
+                    height: chartHeight
+                },
+                series: [{
+                    name: 'Count',
+                    data: []
+                }],
+                plotOptions: {
+                    bar: {
+                        horizontal: true,
+                        distributed: true,
+                        borderRadius: 4
+                    }
+                },
+                dataLabels: {
+                    enabled: true
+                },
+                xaxis: {
+                    ...chartOptions.xaxis,
+                    title: { text: 'Count' }
+                },
+                yaxis: {
+                    ...chartOptions.yaxis,
+                    title: { text: 'PEST Category' }
+                }
+            });
+
+            // Initialize SWOT Distribution Chart
+            charts.swotDistribution = new ApexCharts(document.querySelector("#swot-distribution"), {
+                ...chartOptions,
+                chart: { 
+                    ...chartOptions.chart,
+                    type: 'bar',
+                    height: chartHeight
+                },
+                series: [{
+                    name: 'Count',
+                    data: []
+                }],
+                plotOptions: {
+                    bar: {
+                        horizontal: true,
+                        distributed: true,
+                        borderRadius: 4,
+                        barHeight: '40%'
+                    }
+                },
+                dataLabels: {
+                    enabled: true,
+                    formatter: function(val) {
+                        return val.toFixed(0);
+                    },
+                    style: {
+                        fontSize: '14px',
+                        colors: ['#fff']
+                    }
+                },
+                xaxis: {
+                    ...chartOptions.xaxis,
+                    categories: ['Strengths', 'Weaknesses', 'Opportunities', 'Threats'],
+                    title: {
+                        text: 'Number of Insights',
+                        style: {
+                            fontSize: '14px',
+                            fontWeight: 600
+                        }
+                    }
+                },
+                yaxis: {
+                    ...chartOptions.yaxis,
+                    title: {
+                        text: 'SWOT Categories',
+                        style: {
+                            fontSize: '14px',
+                            fontWeight: 600
+                        }
+                    }
+                },
+                colors: ['#00E396', '#FF4560', '#008FFB', '#FEB019'],
+                title: {
+                    text: 'SWOT Analysis Distribution',
+                    align: 'center',
+                    style: {
+                        fontSize: '16px',
+                        fontWeight: 'bold'
+                    }
+                },
+                tooltip: {
+                    y: {
+                        title: {
+                            formatter: function() {
+                                return 'Count: '
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Render all charts
+            Object.values(charts).forEach(chart => chart.render());
+            
+            // Update with initial data
+            updateCharts(data);
+        }
+
+        document.addEventListener("DOMContentLoaded", function () {
+            fetch('http://127.0.0.1:5000/get-data')
+            .then(response => response.json())
+            .then(data => {
+                globalData = data; // Store data globally
+                initializeFilters(data); // Initialize filters
+                initializeCharts(data); // Initialize charts
+                updateMetrics(data); // Update metrics
+            })
+            .catch(error => {
+                console.error("Error fetching or processing data:", error);
+                const chartIds = ["intensity-trend", "sector-distribution", "likelihood-chart", "country-intensity"];
+                chartIds.forEach(id => {
+                    document.querySelector(`#${id}`).innerHTML = 
+                        `<p class='text-center text-muted'>Error loading chart: ${error.message}</p>`;
+                });
+            });
+        });
+
+        function updateCharts(filteredData) {
+            // Process filtered data
+            let intensityByYear = {};
+            let sectorData = {};
+            let pestData = {};
+            let likelihood = {};
+            let countryIntensity = {};
+            let regionData = {};
+            let topicData = [];
+            let relevanceData = {};
+
+            filteredData.forEach(row => {
+                // Process Intensity
+                if (row.intensity && !isNaN(row.intensity)) {
+                    intensityByYear[row.end_year] = (intensityByYear[row.end_year] || 0) + row.intensity;
+                }
+
+                // Process PEST
+                if (row.pestle && row.pestle !== "") {
+                    let pest = row.pestle.trim();
+                    pestData[pest] = (pestData[pest] || 0) + 1;
+                }
+
+                // Process Likelihood
+                    if (row.likelihood && !isNaN(row.likelihood)) {
+                        let likelihoodValue = parseInt(row.likelihood, 10);
+                    if (likelihoodValue >= 1 && likelihoodValue <= 5) {
+                        likelihood[likelihoodValue] = (likelihood[likelihoodValue] || 0) + 1;
+                    }
+                }
+
+                // Process Sector
+                if (row.sector && row.sector !== "") {
+                    let sector = row.sector.trim();
+                    sectorData[sector] = (sectorData[sector] || 0) + 1;
+                }
+
+                // Process Country
+                if (row.country && row.country !== "") {
+                    let country = row.country.trim();
+                        countryIntensity[country] = (countryIntensity[country] || 0) + row.intensity;
+                    }
+
+                // Process Region
+                if (row.region && row.region !== "") {
+                    let region = row.region.trim();
+                    regionData[region] = (regionData[region] || 0) + 1;
+                }
+
+                // Process Topic
+                if (row.topic && row.topic !== "") {
+                    let topic = row.topic.trim();
+                    let existingTopic = topicData.find(t => t.x === topic);
+                    if (existingTopic) {
+                        existingTopic.y++;
+                    } else {
+                        topicData.push({ x: topic, y: 1 });
+                    }
+                }
+
+                // Process Relevance
+                if (row.relevance && !isNaN(row.relevance)) {
+                    let relevanceValue = parseInt(row.relevance, 10);
+                    relevanceData[relevanceValue] = (relevanceData[relevanceValue] || 0) + 1;
+                }
+            });
+
+            // Update charts with dark mode support
+            const isDarkMode = document.documentElement.getAttribute('data-theme') === 'dark';
+            const chartThemeOptions = {
+                theme: {
+                    mode: isDarkMode ? 'dark' : 'light'
+                },
+                chart: {
+                    background: 'transparent'
+                },
+                grid: {
+                    borderColor: isDarkMode ? '#3B4253' : '#f1f1f1'
+                },
+                xaxis: {
+                    labels: {
+                        style: {
+                            colors: isDarkMode ? '#82868B' : '#82868B'
+                        }
+                    }
+                },
+                yaxis: {
+                    labels: {
+                        style: {
+                            colors: isDarkMode ? '#82868B' : '#82868B'
+                        }
+                    }
+                },
+                dataLabels: {
+                    style: {
+                        colors: [isDarkMode ? '#82868B' : '#82868B']
+                    }
+                },
+                legend: {
+                    labels: {
+                        colors: isDarkMode ? '#82868B' : '#82868B'
+                    }
+                }
+            };
+
+            // Update Intensity Trend Chart
+            charts.intensityTrend.updateOptions({
+                ...chartThemeOptions,
+                xaxis: {
+                    ...chartThemeOptions.xaxis,
+                    categories: Object.keys(intensityByYear).sort(),
+                    tickAmount: 6,
+                    labels: {
+                        rotate: -45,
+                        rotateAlways: true,
+                        style: {
+                            fontSize: '12px',
+                            fontFamily: 'Inter, sans-serif',
+                            colors: isDarkMode ? '#82868B' : '#82868B'
+                        },
+                        formatter: function(value) {
+                            return value ? value.toString() : '';
+                        }
+                    },
+                    title: {
+                        text: 'Year',
+                        style: {
+                            fontSize: '13px',
+                            fontWeight: 600
+                        }
+                    }
+                },
+                grid: {
+                    xaxis: {
+                        lines: {
+                            show: true
+                        }
+                    },
+                    padding: {
+                        top: 5,
+                        right: 20,
+                        bottom: 20,
+                        left: 20
+                    }
+                }
+            });
+            charts.intensityTrend.updateSeries([{
+                name: 'Intensity',
+                data: Object.keys(intensityByYear)
+                    .sort()
+                    .map(year => ({
+                        x: year,
+                        y: intensityByYear[year]
+                    }))
+            }]);
+
+            // Update Sector Distribution Chart
+            const totalSectorCount = Object.values(sectorData).reduce((sum, count) => sum + count, 0);
+            const sortedSectors = Object.entries(sectorData)
+                .sort(([,a], [,b]) => b - a);
+
+            // Group sectors with less than 5% share into "Others"
+            let processedSectors = [];
+            let sectorOthersCount = 0;
+
+            sortedSectors.forEach(([sector, count]) => {
+                const percentage = (count / totalSectorCount) * 100;
+                if (percentage >= 5) {
+                    processedSectors.push([sector, count]);
+                    } else {
+                    sectorOthersCount += count;
+                }
+            });
+
+            // Add "Others" category if it exists
+            if (sectorOthersCount > 0) {
+                processedSectors.push(["Others", sectorOthersCount]);
+            }
+
+            charts.sectorDistribution.updateOptions({
+                ...chartThemeOptions,
+                labels: processedSectors.map(([sector]) => sector),
+                plotOptions: {
+                    pie: {
+                        donut: {
+                            size: '65%',
+                            labels: {
+                                show: true,
+                                name: {
+                                    fontSize: '11px',
+                                    fontFamily: 'Inter, sans-serif',
+                                    fontWeight: 500,
+                                    offsetY: -10
+                                },
+                                value: {
+                                    fontSize: '11px',
+                                    fontFamily: 'Inter, sans-serif',
+                                    fontWeight: 500,
+                                    offsetY: 10,
+                                    formatter: function(val) {
+                                        return val + ' (' + ((val / totalSectorCount) * 100).toFixed(1) + '%)';
+                                    }
+                                },
+                                total: {
+                                    show: true,
+                                    fontSize: '11px',
+                                    fontFamily: 'Inter, sans-serif',
+                                    fontWeight: 500,
+                                    formatter: function() {
+                                        return 'Total: ' + totalSectorCount;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+            charts.sectorDistribution.updateSeries(processedSectors.map(([, count]) => count));
+
+            // Update Likelihood Chart
+            const sortedLikelihood = Object.entries(likelihood)
+                .sort(([a], [b]) => parseInt(a) - parseInt(b));
+            charts.likelihoodChart.updateOptions({
+                ...chartThemeOptions,
+                xaxis: {
+                    ...chartThemeOptions.xaxis,
+                    categories: sortedLikelihood.map(([key]) => `Level ${key}`)
+                }
+            });
+            charts.likelihoodChart.updateSeries([{
+                name: 'Count',
+                data: sortedLikelihood.map(([, value]) => value)
+            }]);
+
+            // Update Country Intensity Chart
+            const topCountries = Object.entries(countryIntensity)
+                .sort(([,a], [,b]) => b - a)
+                .slice(0, 10);
+            charts.countryIntensity.updateOptions({
+                ...chartThemeOptions,
+                xaxis: {
+                    ...chartThemeOptions.xaxis,
+                    categories: topCountries.map(([country]) => country)
+                }
+            });
+            charts.countryIntensity.updateSeries([{
+                name: 'Intensity',
+                data: topCountries.map(([, value]) => value)
+            }]);
+
+            // Update Region Distribution Chart
+            const sortedRegions = Object.entries(regionData)
+                .sort(([,a], [,b]) => b - a);
+            
+            // Calculate total for percentages
+            const totalRegionCount = sortedRegions.reduce((sum, [, count]) => sum + count, 0);
+            
+            // Process regions and calculate percentages
+            const processedRegions = sortedRegions.map(([region, count]) => {
+                const percentage = (count / totalRegionCount) * 100;
+                return {
+                    x: region,
+                    y: count,
+                    percentage: percentage.toFixed(1)
+                };
+            });
+
+            charts.regionDistribution.updateOptions({
+                ...chartThemeOptions,
+                chart: {
+                    ...chartThemeOptions.chart,
+                    type: 'bar',
+                    height: 650,
+                    animations: {
+                        enabled: true,
+                        dynamicAnimation: {
+                            speed: 350
+                        }
+                    },
+                    toolbar: {
+                        show: false
+                    }
+                },
+                plotOptions: {
+                    bar: {
+                        horizontal: true,
+                        distributed: true,
+                        dataLabels: {
+                            position: 'center'
+                        },
+                        borderRadius: 4,
+                        barHeight: '75%'
+                    }
+                },
+                dataLabels: {
+                    enabled: true,
+                    textAnchor: 'middle',
+                    style: {
+                        colors: [isDarkMode ? '#FFFFFF' : '#2C2C2C'],
+                        fontSize: '13px',
+                        fontWeight: '600',
+                        fontFamily: 'Inter, sans-serif'
+                    },
+                    formatter: function(val, opt) {
+                        return `${val} (${processedRegions[opt.dataPointIndex].percentage}%)`;
+                    },
+                    dropShadow: {
+                        enabled: true,
+                        top: 1,
+                        left: 1,
+                        blur: 2,
+                        opacity: 0.2
+                    }
+                },
+                xaxis: {
+                    categories: processedRegions.map(item => item.x),
+                    labels: {
+                        style: {
+                            fontSize: '12px',
+                            fontFamily: 'Inter, sans-serif',
+                            colors: isDarkMode ? '#82868B' : '#82868B'
+                        },
+                        trim: true,
+                        maxHeight: 200
+                    },
+                    title: {
+                        text: 'Number of Insights',
+                        style: {
+                            fontSize: '14px',
+                            fontWeight: 600,
+                            color: isDarkMode ? '#D0D2D6' : '#2C2C2C'
+                        }
+                    }
+                },
+                yaxis: {
+                    labels: {
+                        style: {
+                            fontSize: '12px',
+                            fontFamily: 'Inter, sans-serif',
+                            colors: isDarkMode ? '#82868B' : '#82868B'
+                        },
+                        maxWidth: 160
+                    },
+                    title: {
+                        text: 'Region',
+                        style: {
+                            fontSize: '14px',
+                            fontWeight: 600,
+                            color: isDarkMode ? '#D0D2D6' : '#2C2C2C'
+                        }
+                    }
+                },
+                colors: ['#7367F0', '#28C76F', '#00CFE8', '#FF9F43', '#EA5455', '#A798FF', '#26A69A'],
+                title: {
+                    text: `Regional Distribution (Total: ${totalRegionCount})`,
+                    align: 'center',
+                    style: {
+                        fontSize: '16px',
+                        fontWeight: 'bold',
+                        fontFamily: 'Inter, sans-serif',
+                        color: isDarkMode ? '#D0D2D6' : '#2C2C2C'
+                    }
+                },
+                tooltip: {
+                    enabled: true,
+                    theme: isDarkMode ? 'dark' : 'light',
+                    style: {
+                        fontSize: '12px',
+                        fontFamily: 'Inter, sans-serif'
+                    },
+                    y: {
+                        title: {
+                            formatter: function() {
+                                return 'Insights: ';
+                            }
+                        },
+                        formatter: function(value, { dataPointIndex }) {
+                            return `${value} (${processedRegions[dataPointIndex].percentage}% of total)`;
+                        }
+                    }
+                },
+                grid: {
+                    xaxis: {
+                        lines: {
+                            show: true
+                        }
+                    },
+                    padding: {
+                        top: 5,
+                        right: 25,
+                        bottom: 5,
+                        left: 20
+                    }
+                }
+            });
+
+            charts.regionDistribution.updateSeries([{
+                name: 'Number of Insights',
+                data: processedRegions.map(item => item.y)
+            }]);
+
+            // Update Topic Distribution Chart
+            const sortedTopics = topicData
+                .sort((a, b) => b.y - a.y)
+                .slice(0, 15); // Show top 15 topics
+            charts.topicDistribution.updateOptions({
+                ...chartThemeOptions,
+                xaxis: {
+                    ...chartThemeOptions.xaxis,
+                    categories: sortedTopics.map(topic => topic.x)
+                }
+            });
+            charts.topicDistribution.updateSeries([{
+                name: 'Topics',
+                data: sortedTopics.map(topic => topic.y)
+            }]);
+
+            // Update Relevance Distribution Chart
+            const sortedRelevance = Object.entries(relevanceData)
+                .sort(([a], [b]) => parseInt(a) - parseInt(b));
+            charts.relevanceDistribution.updateOptions({
+                ...chartThemeOptions,
+                xaxis: {
+                    ...chartThemeOptions.xaxis,
+                    categories: sortedRelevance.map(([key]) => `Level ${key}`)
+                }
+            });
+            charts.relevanceDistribution.updateSeries([{
+                name: 'Count',
+                data: sortedRelevance.map(([, value]) => value)
+            }]);
+
+            // Update PEST Distribution Chart
+            const sortedPest = Object.entries(pestData)
+                .sort(([,a], [,b]) => b - a);
+            charts.pestDistribution.updateOptions({
+                ...chartThemeOptions,
+                xaxis: {
+                    ...chartThemeOptions.xaxis,
+                    categories: sortedPest.map(([category]) => category)
+                }
+            });
+            charts.pestDistribution.updateSeries([{
+                name: 'Count',
+                data: sortedPest.map(([, value]) => value)
+            }]);
+
+            // Update SWOT Distribution Chart
+            let swotData = {
+                'Strength': 0,
+                'Weakness': 0,
+                'Opportunity': 0,
+                'Threat': 0
+            };
+
+            filteredData.forEach(row => {
+                const swotCategory = determineSWOT(row);
+                if (swotCategory) {
+                    swotData[swotCategory]++;
+                }
+            });
+
+            const sortedSwot = Object.entries(swotData)
+                .sort(([,a], [,b]) => b - a);
+
+            charts.swotDistribution.updateOptions({
+                ...chartThemeOptions,
+                xaxis: {
+                    ...chartThemeOptions.xaxis,
+                    categories: sortedSwot.map(([category]) => category)
+                }
+            });
+            charts.swotDistribution.updateSeries([{
+                name: 'Count',
+                data: sortedSwot.map(([, value]) => value)
+            }]);
+        }
+
+        function updateMetrics(filteredData) {
+            const isDarkMode = document.documentElement.getAttribute('data-theme') === 'dark';
+            // Update metrics with filtered data
+            let totalIntensity = 0;
+            let totalLikelihood = 0;
+            let totalRelevance = 0;
+            let countIntensity = 0;
+            let countLikelihood = 0;
+            let countRelevance = 0;
+            let uniqueCountries = new Set();
+
+            filteredData.forEach(row => {
+                if (row.intensity && !isNaN(row.intensity)) {
+                    totalIntensity += row.intensity;
+                    countIntensity++;
+                }
+                if (row.likelihood && !isNaN(row.likelihood)) {
+                    totalLikelihood += parseInt(row.likelihood);
+                    countLikelihood++;
+                }
+                if (row.relevance && !isNaN(row.relevance)) {
+                    totalRelevance += parseInt(row.relevance);
+                    countRelevance++;
+                }
+                if (row.country) {
+                    uniqueCountries.add(row.country);
+                }
+            });
+
+            document.getElementById('avg-intensity').textContent = 
+                countIntensity ? (totalIntensity / countIntensity).toFixed(1) : '0';
+            document.getElementById('avg-likelihood').textContent = 
+                countLikelihood ? (totalLikelihood / countLikelihood).toFixed(1) : '0';
+            document.getElementById('avg-relevance').textContent = 
+                countRelevance ? (totalRelevance / countRelevance).toFixed(1) : '0';
+            document.getElementById('total-countries').textContent = uniqueCountries.size;
+
+            // Update metric card colors based on theme
+            document.querySelectorAll('.metric-card').forEach(card => {
+                card.style.backgroundColor = isDarkMode ? '#283046' : '#fff';
+                card.style.color = isDarkMode ? '#D0D2D6' : '#6E6B7B';
+            });
+        }
+
+        function toggleTheme() {
+            const body = document.documentElement;
+            const currentTheme = body.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            const themeButton = document.querySelector('.theme-toggle');
+            
+            body.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            
+            // Update button icon and text
+            const icon = themeButton.querySelector('i');
+            const text = themeButton.querySelector('span');
+            
+            if (newTheme === 'dark') {
+                icon.className = 'fas fa-sun';
+                text.textContent = 'Light Mode';
+                } else {
+                icon.className = 'fas fa-moon';
+                text.textContent = 'Dark Mode';
+            }
+
+            // Update metrics
+            updateMetrics(window.currentFilteredData || []);
+
+            // Update all charts with new theme
+            Object.values(charts).forEach(chart => {
+                const isDarkMode = newTheme === 'dark';
+                chart.updateOptions({
+                    theme: {
+                        mode: newTheme
+                    },
+                    chart: {
+                        background: 'transparent'
+                    },
+                    grid: {
+                        borderColor: isDarkMode ? '#3B4253' : '#f1f1f1'
+                    },
+                    xaxis: {
+                        labels: {
+                            style: {
+                                colors: isDarkMode ? '#82868B' : '#82868B'
+                            }
+                        }
+                    },
+                    yaxis: {
+                        labels: {
+                            style: {
+                                colors: isDarkMode ? '#82868B' : '#82868B'
+                            }
+                        }
+                    },
+                    dataLabels: {
+                        style: {
+                            colors: [isDarkMode ? '#82868B' : '#82868B']
+                        }
+                    }
+                });
+            });
+        }
+
+        // Initialize theme from localStorage
+        document.addEventListener('DOMContentLoaded', function() {
+            const savedTheme = localStorage.getItem('theme') || 'light';
+            document.documentElement.setAttribute('data-theme', savedTheme);
+            
+            const themeButton = document.querySelector('.theme-toggle');
+            const icon = themeButton.querySelector('i');
+            const text = themeButton.querySelector('span');
+            
+            if (savedTheme === 'dark') {
+                icon.className = 'fas fa-sun';
+                text.textContent = 'Light Mode';
+            }
+        });
+
+        // Translation mappings
+        const translations = {
+            'en': {
+                'Analytics Dashboard': 'Analytics Dashboard',
+                'Dark Mode': 'Dark Mode',
+                'Light Mode': 'Light Mode',
+                'Profile': 'Profile',
+                'Logout': 'Logout',
+                'Filters': 'Filters',
+                'Reset': 'Reset',
+                'End Year': 'End Year',
+                'Sector': 'Sector',
+                'Country': 'Country',
+                'PEST': 'PEST',
+                'Region': 'Region',
+                'Topic': 'Topic',
+                'SWOT': 'SWOT',
+                'Source': 'Source',
+                'All Years': 'All Years',
+                'All Sectors': 'All Sectors',
+                'All Countries': 'All Countries',
+                'All': 'All',
+                'All Regions': 'All Regions',
+                'All Topics': 'All Topics',
+                'All Sources': 'All Sources',
+                'Average Intensity': 'Average Intensity',
+                'Average Likelihood': 'Average Likelihood',
+                'Average Relevance': 'Average Relevance',
+                'Total Countries': 'Total Countries',
+                'Intensity Over Time': 'Intensity Over Time',
+                'Sector Distribution': 'Sector Distribution',
+                'Likelihood Distribution': 'Likelihood Distribution',
+                'Top Countries by Intensity': 'Top Countries by Intensity',
+                'Regional Distribution': 'Regional Distribution',
+                'Topic Distribution': 'Topic Distribution',
+                'Relevance Distribution': 'Relevance Distribution',
+                'PEST Distribution': 'PEST Distribution',
+                'SWOT Analysis Distribution': 'SWOT Analysis Distribution',
+                'Strengths': 'Strengths',
+                'Weaknesses': 'Weaknesses',
+                'Opportunities': 'Opportunities',
+                'Threats': 'Threats'
+            },
+            'hi': {
+                'Analytics Dashboard': 'विश्लेषण डैशबोर्ड',
+                'Dark Mode': 'डार्क मोड',
+                'Light Mode': 'लाइट मोड',
+                'Profile': 'प्रोफ़ाइल',
+                'Logout': 'लॉग आउट',
+                'Filters': 'फ़िल्टर',
+                'Reset': 'रीसेट',
+                'End Year': 'समाप्ति वर्ष',
+                'Sector': 'क्षेत्र',
+                'Country': 'देश',
+                'PEST': 'पेस्ट',
+                'Region': 'क्षेत्र',
+                'Topic': 'विषय',
+                'SWOT': 'स्वोट',
+                'Source': 'स्रोत',
+                'All Years': 'सभी वर्ष',
+                'All Sectors': 'सभी क्षेत्र',
+                'All Countries': 'सभी देश',
+                'All': 'सभी',
+                'All Regions': 'सभी क्षेत्र',
+                'All Topics': 'सभी विषय',
+                'All Sources': 'सभी स्रोत',
+                'Average Intensity': 'औसत तीव्रता',
+                'Average Likelihood': 'औसत संभावना',
+                'Average Relevance': 'औसत प्रासंगिकता',
+                'Total Countries': 'कुल देश',
+                'Intensity Over Time': 'समय के साथ तीव्रता',
+                'Sector Distribution': 'क्षेत्र वितरण',
+                'Likelihood Distribution': 'संभावना वितरण',
+                'Top Countries by Intensity': 'तीव्रता के आधार पर शीर्ष देश',
+                'Regional Distribution': 'क्षेत्रीय वितरण',
+                'Topic Distribution': 'विषय वितरण',
+                'Relevance Distribution': 'प्रासंगिकता वितरण',
+                'PEST Distribution': 'पेस्ट वितरण',
+                'SWOT Analysis Distribution': 'स्वोट विश्लेषण वितरण',
+                'Strengths': 'शक्तियां',
+                'Weaknesses': 'कमजोरियां',
+                'Opportunities': 'अवसर',
+                'Threats': 'खतरे'
+            }
+        };
+
+        let currentLang = localStorage.getItem('language') || 'en';
+
+        // Store original English texts
+        const originalTexts = new Map();
+
+        function storeOriginalText(element) {
+            if (!element.getAttribute('data-original')) {
+                element.setAttribute('data-original', element.textContent.trim());
+                originalTexts.set(element, element.textContent.trim());
+            }
+        }
+
+        function translateElement(element) {
+            const originalText = element.getAttribute('data-original') || element.textContent.trim();
+            if (translations[currentLang][originalText]) {
+                element.textContent = translations[currentLang][originalText];
+            } else if (currentLang === 'en' && originalTexts.has(element)) {
+                element.textContent = originalTexts.get(element);
+            }
+        }
+
+        function translatePage() {
+            // Store and translate all text elements except the language toggle button
+            document.querySelectorAll('h1, h2, h3, h4, h5, h6, p, span:not(.language-text span), button:not(.language-toggle), a, label, option, div.metric-label, .chart-title').forEach(element => {
+                storeOriginalText(element);
+                translateElement(element);
+            });
+
+            // Update language toggle button text and style
+            const languageText = document.getElementById('language-text');
+            if (currentLang === 'en') {
+                languageText.innerHTML = `<span style="opacity: 0.5">हिंदी</span> | <span style="opacity: 1">English</span>`;
+            } else {
+                languageText.innerHTML = `<span style="opacity: 1">हिंदी</span> | <span style="opacity: 0.5">English</span>`;
+            }
+
+            // Update charts
+            if (charts) {
+                const filteredData = getFilteredData();
+                updateCharts(filteredData);
+            }
+
+            // Update metrics
+            updateMetrics(getFilteredData());
+        }
+
+        function toggleLanguage() {
+            currentLang = currentLang === 'en' ? 'hi' : 'en';
+            localStorage.setItem('language', currentLang);
+            translatePage();
+        }
+
+        // Initialize translation on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            currentLang = localStorage.getItem('language') || 'en';
+            translatePage();
+        });
+
+        // Notification handling
+        document.addEventListener('DOMContentLoaded', function() {
+            // Mark all notifications as read
+            document.querySelector('.mark-all-read').addEventListener('click', function(e) {
+                e.preventDefault();
+                document.querySelectorAll('.notification-item.unread').forEach(item => {
+                    item.classList.remove('unread');
+                });
+                const badge = document.querySelector('.notification-badge');
+                badge.style.display = 'none';
+            });
+
+            // Handle individual notification clicks
+            document.querySelectorAll('.notification-item').forEach(item => {
+                item.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    this.classList.remove('unread');
+                    updateNotificationBadge();
+                });
+            });
+
+            function updateNotificationBadge() {
+                const unreadCount = document.querySelectorAll('.notification-item.unread').length;
+                const badge = document.querySelector('.notification-badge');
+                if (unreadCount > 0) {
+                    badge.style.display = 'flex';
+                    badge.textContent = unreadCount;
+                } else {
+                    badge.style.display = 'none';
+                }
+            }
+        });
+
+        // Add toggleFilters function before the translation mappings
+        function toggleFilters() {
+            const filtersSection = document.getElementById('filtersSection');
+            const toggleButton = document.querySelector('.filter-toggle-btn');
+            const isVisible = filtersSection.style.display !== 'none';
+            
+            filtersSection.style.display = isVisible ? 'none' : 'block';
+            toggleButton.classList.toggle('active');
+            
+            // Update button text based on state
+            const buttonText = toggleButton.querySelector('span');
+            buttonText.textContent = isVisible ? 'Filters' : 'Hide Filters';
+        }
+    </script>
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
