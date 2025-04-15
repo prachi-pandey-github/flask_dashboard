@@ -45,13 +45,4 @@ Update config.py with your MySQL credentials
 python app.py
 The dashboard will be available at http://127.0.0.1:5000/.
 
-![Dashboard Preview](wp1.PNG)
-![Dashboard Preview](wp2.PNG)
-![Dashboard Preview](wp3.PNG)
-![Dashboard Preview](wp4.PNG)
-![Dashboard Preview](wp5.PNG)
-![Dashboard Preview](bp1.PNG)
-![Dashboard Preview](bp2.PNG)
-![Dashboard Preview](bp3.PNG)
-![Dashboard Preview](bp4.PNG)
-![Dashboard Preview](bp5.PNG)
+
